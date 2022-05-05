@@ -14,8 +14,10 @@ public class Race : ScriptableObject
 
     //this is for any skills a race might have, such as half elf giving two skills, elves having perception, and half orcs intimidation
     public int[] racialSkills =  { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-    public Image[] raceAppearance;
-    public Image[] armorAppearance; //ordered 'clothed', 'light', 'medium', and 'heavy' by class
+    public Image[] raceAppearanceF;
+    public Image[] raceAppearanceM;
+    public Image[] Hair;
+    public Image[] armorAppearance; //ordered by class in alphabetical order
     public int speed = 30;
 
 

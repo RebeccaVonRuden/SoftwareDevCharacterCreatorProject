@@ -23,19 +23,19 @@ public class PlayerCharacter : MonoBehaviour
     private string charName;
 
     private int[] playerSkills;
-
-    private int[] playerStats;
+    private int[] displayStats = new []{0,0,0,0,0,0};
+    private int[] playerStats = {0,0,0,0,0,0};
     private bool charGender = false; //false = male true = female. meaning the first option for race appearance is male the second is female
 
     [SerializeField] private GameObject questionaireStarter;
-    [SerializeField] private List<TextMeshPro> attributeObjects;/*
+    [SerializeField] private List<Text> attributeObjects;/*
     order goes as such: name, race, class, alignment, str, dex, con, int, wis, cha, skills(in alphabetical order), 
     str save, dex save, con save, int save, wis save, cha save, speed, can spellcast*/
 
     [SerializeField] private GameObject canSpellcast;
 
     [SerializeField] private List<Image> bodyObjects;
-    //order goes: body area, armor area, hand object left, hand object right
+    //order goes: body area, armor area, hand object left, hand object right, hair
     [SerializeField] private string[] alignmentOptions = new string[]
     {
         "Lawful Good", "Neutral Good", "Chaotic Good", "Neutral Good", "True Neutral", "Neutral Evil", "Chaotic Good",
@@ -84,19 +84,20 @@ public class PlayerCharacter : MonoBehaviour
     }
     public void SetBetweenDruid()
     {
-        SetBetween(17,21);
+        SetBetween(17,20);
     }
     public void SetBetweenFighter()
     {
-        SetBetween(22,26);
+        SetBetween(21,26);
     }
     public void SetBetweenMonk()
     {
+        charRace.speed += 10;
         SetBetween(27,31);
     }
     public void SetBetweenRanger()
     {
-        SetBetween(37,39);
+        SetBetween(37,40);
     }
     public void SetBetweenPaladan()
     {
@@ -104,19 +105,19 @@ public class PlayerCharacter : MonoBehaviour
     }
     public void SetBetweenRogue()
     {
-        SetBetween(40,44);
+        SetBetween(41,45);
     }
     public void SetBetweenScorc()
     {
-        SetBetween(45,48);
+        SetBetween(46,49);
     }
     public void SetBetweenWarlock()
     {
-        SetBetween(49,53);
+        SetBetween(50,54);
     }
     public void SetBetweenWizard()
     {
-        SetBetween(54,63);
+        SetBetween(55,63);
     }
     
     
@@ -155,26 +156,39 @@ public class PlayerCharacter : MonoBehaviour
 
     public void setPlayerRace(Race input)
     {
-        
+        int hold = new Random().Next(0, 1); //getting random integer between 0 and 1 for determining which appearance is being used
         charRace = input;
-        if (charGender==false)
-        bodyObjects[0] = charRace.raceAppearance[0];
+        if (charGender == false)
+        {
+            bodyObjects[0] = charRace.raceAppearanceM[hold]; //setting main body appearance for male
+            bodyObjects[4] = charRace.Hair[hold]; //setting hair appearance for male
+        }
+        else
+        {
+            bodyObjects[0] = charRace.raceAppearanceF[hold];//setting main body appearance for female
+            bodyObjects[4] = charRace.Hair[hold+2];//setting hair appearance for female, it is +2 since the hair is M1, M2, F1, F2
+        }
+        //above commands are done here so that its not randomised each time you choose a new class, name, or alignment
+        UpdateClassARacialStats();
         updateCharacter();
     }
 
     public void setPlayerClass(Classes input)
     {
         playerClass = input;
-        bodyObjects[1] = charRace.armorAppearance[playerClass.armorType]; //setting armor
+        bodyObjects[1] = charRace.armorAppearance[playerClass.apparelIndex]; //setting aapparel
         bodyObjects[2] = playerClass.itemOptions[new Random().Next(0, 2)]; //setting left hand object
         bodyObjects[2] = playerClass.itemOptions[new Random().Next(3, 5)]; //setting right hand object
+        //the above commands are done before the update function and seperate from it so that it is kept between the changed selections
+        UpdateClassARacialStats();
         updateCharacter();
+        
     }
-
+    
     public void setPlayerName(string input)
     {
         charName = input;
-        attributeObjects[0].SetText(input);
+        attributeObjects[0].text =(input);
     }
 
     public void updateCharacter()
@@ -182,36 +196,36 @@ public class PlayerCharacter : MonoBehaviour
         /*order goes as such: name, race, class, alignment, str, dex, con, int, wis, cha, skills(in alphabetical order), 
     str save, dex save, con save, int save, wis save, cha save, speed, can spellcast*/
         int index = 0;
-        attributeObjects[index].SetText(charName);
+        attributeObjects[index].text =(charName);
         index++;
-        attributeObjects[index].SetText(charRace.RaceName);
+        attributeObjects[index].text =(charRace.RaceName);
         index++;
-        attributeObjects[index].SetText(playerClass.name);
+        attributeObjects[index].text =(playerClass.name);
         index++;
-        attributeObjects[index].SetText(alignment);
+        attributeObjects[index].text =(alignment);
         index++;
         for (int i = 0; i < 8; i++)
         {
-           attributeObjects[index].SetText(playerStats[i].ToString());
+           attributeObjects[index].text =(displayStats[i].ToString());
            index++;
         }
         for (int i = 0; i < 18; i++)
         { //setting no prof, prof, expertice, or jack of all trades in all skills
             if (playerSkills[i] == 0)
             {
-                attributeObjects[index].SetText("");
+                attributeObjects[index].text =("");
             }
             else if (playerSkills[i] == 1)
             {
-                attributeObjects[index].SetText("P");
+                attributeObjects[index].text =("P");
             }
             else if(playerSkills[i]==2)
             {
-                attributeObjects[index].SetText("E");
+                attributeObjects[index].text =("E");
             }
             else
             {
-                attributeObjects[index].SetText("J");
+                attributeObjects[index].text =("J");
             }
 
             index++;
@@ -220,16 +234,16 @@ public class PlayerCharacter : MonoBehaviour
         { //setting profichent or not profichent in saving throws
             if (playerClass.savingThrows[i] == true)
             {
-                attributeObjects[index].SetText("P");
+                attributeObjects[index].text =("P");
             }
             else
             {
-                attributeObjects[index].SetText("");
+                attributeObjects[index].text =("");
             }
 
             index++;
         }
-        attributeObjects[index].SetText(charRace.speed.ToString());
+        attributeObjects[index].text =(charRace.speed.ToString());
         if (playerClass.canSpellcast)
             canSpellcast.SetActive(true);
         else
@@ -241,20 +255,64 @@ public class PlayerCharacter : MonoBehaviour
     public void GenerateRandomCharacter()
     {
         alignment = alignmentOptions[new Random().Next(0, 8)];
+        playerStats =GenerateCharacteristics();
+        setPlayerClassWoUpdate(charClassOptions[new Random().Next(0, charClassOptions.Length)]);
+        setPlayerRaceWoUpdate(charRaceOptions[new Random().Next(0, charRaceOptions.Length)]);
         
-        playerClass = charClassOptions[new Random().Next(0, charClassOptions.Length)];
-        charRace= charRaceOptions[new Random().Next(0, charRaceOptions.Length)];
-        int[] stats = GenerateCharacteristics();
-        playerStats[0] = stats[playerClass.priorityTable[0]]; 
-        playerStats[1] = stats[playerClass.priorityTable[1]]; 
-        playerStats[2] = stats[playerClass.priorityTable[2]]; 
-        playerStats[3] = stats[playerClass.priorityTable[3]]; 
-        playerStats[4] = stats[playerClass.priorityTable[4]]; 
-        playerStats[5] = stats[playerClass.priorityTable[5]];
+        
         updateCharacter();
     }
+    private void setPlayerClassWoUpdate(Classes input)
+    {
+        playerClass = input;
+        bodyObjects[1] = charRace.armorAppearance[playerClass.apparelIndex]; //setting aapparel appearance
+        bodyObjects[2] = playerClass.itemOptions[new Random().Next(0, 2)]; //setting left hand object
+        bodyObjects[2] = playerClass.itemOptions[new Random().Next(3, 5)]; //setting right hand object
+        //the above commands are done before the update function and seperate from it so that it is kept between the changed selections
+        updateStats();
+        if (charRace != null)
+        {UpdateClassARacialStats();
+        }
+    }
 
+    private void updateStats()
+    {
+        List<int> stats = new List<int>(playerStats);
+        stats.Sort();
+        playerStats[0] = stats[5-playerClass.priorityTable.IndexOf(0)];
+        playerStats[1] = stats[5-playerClass.priorityTable.IndexOf(1)];
+        playerStats[2] = stats[5-playerClass.priorityTable.IndexOf(2)];
+        playerStats[3] = stats[5-playerClass.priorityTable.IndexOf(3)];
+        playerStats[4] = stats[5-playerClass.priorityTable.IndexOf(4)];
+        playerStats[5] = stats[5-playerClass.priorityTable.IndexOf(5)];
+    }
+    public void setPlayerRaceWoUpdate(Race input)
+    {
+        int hold = new Random().Next(0, 1); //getting random integer between 0 and 1 for determining which appearance is being used
+        charRace = input;
+        if (charGender == false)
+        {
+            bodyObjects[0] = charRace.raceAppearanceM[hold]; //setting main body appearance for male
+            bodyObjects[4] = charRace.Hair[hold]; //setting hair appearance for male
+        }
+        else
+        {
+            bodyObjects[0] = charRace.raceAppearanceF[hold];//setting main body appearance for female
+            bodyObjects[4] = charRace.Hair[hold+2];//setting hair appearance for female, it is +2 since the hair is M1, M2, F1, F2
+        }
 
+        UpdateClassARacialStats();
+        //above commands are done here so that its not randomised each time you choose a new class, name, or alignment
 
+    }
 
+    private void UpdateClassARacialStats()
+    {
+        displayStats[0] = charRace.racialMods[0] + playerStats[0];
+        displayStats[1] = charRace.racialMods[1] + playerStats[1];
+        displayStats[2] = charRace.racialMods[2] + playerStats[2];
+        displayStats[3] = charRace.racialMods[3] + playerStats[3];
+        displayStats[4] = charRace.racialMods[4] + playerStats[4];
+        displayStats[5] = charRace.racialMods[5] + playerStats[5];
+    }
 }
