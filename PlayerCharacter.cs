@@ -28,7 +28,7 @@ public class PlayerCharacter : MonoBehaviour
     private int[] _displayStats = {0,0,0,0,0,0};
     private int[] _playerStats = {0,0,0,0,0,0};
     private bool _charGender = true; //true = male false = female. meaning the first option for race appearance is male the second is female
-
+    private int CharSpeed =30;
     [SerializeField] private GameObject questionaireStarter;
     [SerializeField] private List<TMP_Text> attributeObjects = new List<TMP_Text>();/*
     order goes as such: name, race, class, alignment, str, dex, con, int, wis, cha, skills(in alphabetical order), 
@@ -81,6 +81,9 @@ public class PlayerCharacter : MonoBehaviour
     public void SetGender()
     {
         _charGender = !_charGender;
+        SetPlayerRaceWoUpdate(_charRace);
+        SetPlayerClassWoUpdate(_playerClass);
+        
     }
 
     private void SetSkills()
@@ -122,7 +125,7 @@ public class PlayerCharacter : MonoBehaviour
     }
     public void SetBetweenMonk()
     {
-        _charRace.speed += 10;
+        CharSpeed = _charRace.speed +10;
         SetBetween(27,31);
     }
     public void SetBetweenRanger()
@@ -192,28 +195,46 @@ public class PlayerCharacter : MonoBehaviour
 
     public void SetPlayerRace(Race input)
     {
-        int hold = Random.Range(0, 1); //getting random integer between 0 and 1 for determining which appearance is being used
+        int hold = Random.Range(0, 4); //getting random integer between 0 and 4 for determining which appearance is being used
          _charRace = input;
+         bodyObjects[4].SetActive(true);
          if (_charGender)
          { 
              bodyObjects[0].GetComponent<Image>().sprite= _charRace.raceAppearanceM[hold]; //setting main body appearance for male
-             bodyObjects[4].GetComponent<Image>().sprite = _charRace.hair[hold]; //setting hair appearance for male
+             bodyObjects[4].GetComponent<Image>().sprite = _charRace.hairM[hold]; //setting hair appearance for male
+             if (bodyObjects[4].GetComponent<Image>().sprite == null)
+             {
+                 bodyObjects[4].SetActive(false);
+             }
+             bodyObjects[1].GetComponent<Image>().sprite = _charRace.armorAppearanceM[_playerClass.apparelIndex];
          }
         else
          {
              bodyObjects[0].GetComponent<Image>().sprite = _charRace.raceAppearanceF[hold];//setting main body appearance for female
-             bodyObjects[4].GetComponent<Image>().sprite = _charRace.hair[hold+2];//setting hair appearance for female, it is +2 since the hair is M1, M2, F1, F2
+             bodyObjects[4].GetComponent<Image>().sprite = _charRace.hairF[hold];//setting hair appearance for female
+             if (bodyObjects[4].GetComponent<Image>().sprite == null)
+             {
+                 bodyObjects[4].SetActive(false);
+             }
+             bodyObjects[1].GetComponent<Image>().sprite = _charRace.armorAppearanceM[_playerClass.apparelIndex];
          }
         // //above commands are done here so that its not randomised each time you choose a new class, name, or alignment
         UpdateClassARacialStats();
         SetSkills();
-         UpdateCharacter();
+        UpdateCharacter();
     }
 
     public void SetPlayerClass(Classes input)
     {
         _playerClass = input;
-        bodyObjects[1].GetComponent<Image>().sprite = _charRace.armorAppearance[_playerClass.apparelIndex]; //setting aapparel
+       if(_charGender)
+       {
+           bodyObjects[1].GetComponent<Image>().sprite = _charRace.armorAppearanceM[_playerClass.apparelIndex]; //setting aapparel
+       }
+       else
+       {
+           bodyObjects[1].GetComponent<Image>().sprite = _charRace.armorAppearanceF[_playerClass.apparelIndex];
+        }
         bodyObjects[3].GetComponent<Image>().sprite = _playerClass.itemOptions[Random.Range(0, 2)]; //setting left hand object
         bodyObjects[2].GetComponent<Image>().sprite = _playerClass.itemOptions[Random.Range(3, 5)]; //setting right hand object
         //the above commands are done before the update function and seperate from it so that it is kept between the changed selections
@@ -289,7 +310,7 @@ public class PlayerCharacter : MonoBehaviour
 
             index++;
         }
-        attributeObjects[index].text =(_charRace.speed.ToString());
+        attributeObjects[index].text =(CharSpeed.ToString());
         if (_playerClass.canSpellcast)
             canSpellcast.SetActive(true);
         else
@@ -302,12 +323,15 @@ public class PlayerCharacter : MonoBehaviour
     {
         _alignment = alignmentOptions[Random.Range(0, 8)];
         _playerStats =GenerateCharacteristics();
-        _charRace = charRaceOptions[Random.Range(0, charRaceOptions.Length)];
-        _playerClass = charClassOptions[Random.Range(0, charClassOptions.Length)];
+       // _charRace = charRaceOptions[Random.Range(0, charRaceOptions.Length)];
+       _charRace = charRaceOptions[9]; //for demo purposes only, remove afterwards 
+       CharSpeed = _charRace.speed;
+       _playerClass = charClassOptions[Random.Range(0, charClassOptions.Length)];
+       
         SetPlayerClassWoUpdate(charClassOptions[Random.Range(0, charClassOptions.Length)]);
         SetPlayerRaceWoUpdate(charRaceOptions[Random.Range(0, charRaceOptions.Length)]);
         SetSkills();
-        charName = GetRandomName();
+       // charName = GetRandomName();
         
         
         UpdateCharacter();
@@ -316,12 +340,15 @@ public class PlayerCharacter : MonoBehaviour
     {
         _alignment = alignmentOptions[Random.Range(0, 8)];
         _playerStats =GenerateCharacteristics();
-        _charRace = charRaceOptions[Random.Range(0, charRaceOptions.Length)];
-        _playerClass = cls;
+        //_charRace = charRaceOptions[Random.Range(0, charRaceOptions.Length)];
+        
+        _charRace = charRaceOptions[9]; //for demo purposes only, remove afterwards
+         CharSpeed = _charRace.speed; 
+         _playerClass = cls;
         SetPlayerClassWoUpdate(_playerClass);
         SetPlayerRaceWoUpdate(_charRace);
         SetSkills();
-        charName = GetRandomName();
+       // charName = GetRandomName();
         
         
         UpdateCharacter();
@@ -331,8 +358,10 @@ public class PlayerCharacter : MonoBehaviour
         //6 is monk, 7 is paladan, 8 is ranger, 9 is rogue, 10 is scorc, 11 is warlock, 12 is wizard
         _alignment = alignmentOptions[Random.Range(0, 8)];
         _playerStats =GenerateCharacteristics();
-        _charRace = charRaceOptions[Random.Range(0, charRaceOptions.Length)];
-        _playerClass = charClassOptions[Random.Range(0, charClassOptions.Length)];
+        //_charRace = charRaceOptions[Random.Range(0, charRaceOptions.Length)];
+        _charRace = charRaceOptions[9]; //for demo purposes only, remove afterwards
+        CharSpeed = _charRace.speed;
+            _playerClass = charClassOptions[Random.Range(0, charClassOptions.Length)];
         SetPlayerClassWoUpdate(_playerClass);
         SetPlayerRaceWoUpdate(_charRace);
         SetSkills();
@@ -360,19 +389,28 @@ public class PlayerCharacter : MonoBehaviour
         {SetBetweenWarlock();}
         if(input==12)
         {SetBetweenWizard();}
-        charName = GetRandomName();
+       // charName = GetRandomName();
 
     }
     private void SetPlayerClassWoUpdate(Classes input)
     {
         _playerClass = input;
         if (bodyObjects != null)
-            bodyObjects[1].GetComponent<Image>().sprite =
-                _charRace.armorAppearance[_playerClass.apparelIndex]; //setting aapparel appearance
+        {
+            if (_charGender)
+            {
+                bodyObjects[1].GetComponent<Image>().sprite = _charRace.armorAppearanceM[_playerClass.apparelIndex]; //setting aapparel
+            }
+            else
+            {
+                bodyObjects[1].GetComponent<Image>().sprite = _charRace.armorAppearanceF[_playerClass.apparelIndex];
+            }
+        }
+
         bodyObjects[3].GetComponent<Image>().sprite = _playerClass.itemOptions[Random.Range(0, 2)]; //setting left hand object
         bodyObjects[2].GetComponent<Image>().sprite = _playerClass.itemOptions[Random.Range(3, 5)]; //setting right hand object
         //the above commands are done before the update function and seperate from it so that it is kept between the changed selections
-        UpdateStats();
+       // UpdateStats();
         if (_charRace != null)
         {UpdateClassARacialStats();
         }
@@ -382,30 +420,42 @@ public class PlayerCharacter : MonoBehaviour
     {
         List<int> stats = new List<int>(_playerStats);
         stats.Sort();
-        _playerStats[0] = stats[5-FindIndex(0)];
-        _playerStats[1] = stats[5-FindIndex(1)];
-        _playerStats[2] = stats[5-FindIndex(2)];
-        _playerStats[3] = stats[5-FindIndex(3)];
-        _playerStats[4] = stats[5-FindIndex(4)];
-        _playerStats[5] = stats[5-FindIndex(5)];
+        _playerStats[0] = stats[FindIndex(0)];
+        _playerStats[1] = stats[FindIndex(1)];
+        _playerStats[2] = stats[FindIndex(2)];
+        _playerStats[3] = stats[FindIndex(3)];
+        _playerStats[4] = stats[FindIndex(4)];
+        _playerStats[5] = stats[FindIndex(5)];
     }
     public void SetPlayerRaceWoUpdate(Race input)
     {
-        int hold = Random.Range(0, 5); //getting random integer between 0 and 1 for determining which appearance is being used
+       
+        int hold = Random.Range(0, 4); //getting random integer between 0 and 4 for determining which appearance is being used
         _charRace = input;
+        bodyObjects[4].SetActive(true);
         if (_charGender)
-        {
-            bodyObjects[0].GetComponent<Image>().sprite = _charRace.raceAppearanceM[hold]; //setting main body appearance for male
-            bodyObjects[4].GetComponent<Image>().sprite = _charRace.hair[hold]; //setting hair appearance for male
-          
+        { 
+            bodyObjects[0].GetComponent<Image>().sprite= _charRace.raceAppearanceM[hold]; //setting main body appearance for male
+            bodyObjects[4].GetComponent<Image>().sprite = _charRace.hairM[hold]; //setting hair appearance for male
+            if (bodyObjects[4].GetComponent<Image>().sprite == null)
+            {
+                bodyObjects[4].SetActive(false);
+            }
+            bodyObjects[1].GetComponent<Image>().sprite = _charRace.armorAppearanceM[_playerClass.apparelIndex];
         }
         else
         {
             bodyObjects[0].GetComponent<Image>().sprite = _charRace.raceAppearanceF[hold];//setting main body appearance for female
-            bodyObjects[4].GetComponent<Image>().sprite = _charRace.hair[hold];//setting hair appearance for female, it is +2 since the hair is M1, M2, F1, F2
+            bodyObjects[4].GetComponent<Image>().sprite = _charRace.hairF[hold];//setting hair appearance for female
+            if (bodyObjects[4].GetComponent<Image>().sprite == null)
+            {
+                bodyObjects[4].SetActive(false);
+            }
+            bodyObjects[1].GetComponent<Image>().sprite = _charRace.armorAppearanceM[_playerClass.apparelIndex];
         }
-
+        // //above commands are done here so that its not randomised each time you choose a new class, name, or alignment
         UpdateClassARacialStats();
+       
         //above commands are done here so that its not randomised each time you choose a new class, name, or alignment
 
     }

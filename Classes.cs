@@ -20,6 +20,7 @@ public class Classes:ScriptableObject
     public bool canSpellcast = false;   
 
     public Sprite[] itemOptions;
+
     //these are the options for hand items, such as a sword, book, staff, etc. they do not go in the characters hands 
     //but will instead go in the appropriate box with the 'left' and 'right' hand denominators
 

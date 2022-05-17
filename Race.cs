@@ -20,9 +20,11 @@ public class Race : ScriptableObject
     //the below sections are for appearance options
     public Sprite[] raceAppearanceF =  {null, null, null, null};
     public Sprite[] raceAppearanceM ={null, null, null, null};
-    public Sprite[] hair ={null, null, null, null};
-    public Sprite[] armorAppearance = {null, null, null, null, null, null, null, null, null, null, null, null}; //ordered by class in alphabetical order
+    public Sprite[] hairF ={null, null, null, null};
+    public Sprite[] hairM ={null, null, null, null};
+    public Sprite[] armorAppearanceF = {null, null, null, null, null, null, null, null, null, null, null, null}; //ordered by class in alphabetical order
     // this is for racial speed, usually only for those with more or less then 30 ft speed
+    public Sprite[] armorAppearanceM = {null, null, null, null, null, null, null, null, null, null, null, null};
     public int speed = 30;
     
 
